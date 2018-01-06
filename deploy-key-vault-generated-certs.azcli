@@ -1,0 +1,23 @@
+
+# -- Key Vault-generated Certificates --
+# Create a cert with the default policy
+az keyvault certificate create --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv -p @policy.json
+
+# Download the secrete (private key information) associated with the cert
+az keyvault secret download --vault-name "sf-lx-vault" --name mcollier-sf2018-lx-kv --encoding base64 --file mcollier-sf2018-lx-kv.pfx
+
+# Convert from PFX to PEM. Password is blank. (Likely not needed if on Linux.)
+openssl pkcs12 -in mcollier-sf2018-lx-kv.pfx -out mcollier-sf2018-lx-kv.pem -nodes
+
+# -- Get the values from Key Vault to use in the ARM template --
+# Source vault ID
+az keyvault show --name sf-lx-vault --query id -o tsv
+
+# Certificate thumbprint
+az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv --query x509ThumbprintHex -o tsv
+
+# Certificate URL
+az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv --query sid -o tsv
+
+az group create --location eastus2 --name mcollier-sf2018-lx-kv --tags "alias=mcollier" "deleteAfter=03/31/2018"
+az group deployment create -g mcollier-sf2018-lx-kv --template-file azuredeploy-linux-secure.json --parameters @azuredeploy-linux-secure.parameters.json --parameters clusterName=mcollier-sf2018-lx-kv sourceVaultValue=/subscriptions/8e95e0bb-d7cc-4454-9443-75ca862d34c1/resourceGroups/mcollier-sf2018-lx-vault/providers/Microsoft.KeyVault/vaults/sf-lx-vault certificateUrlValue=https://sf-lx-vault.vault.azure.net/secrets/mcollier-sf2018-lx-kv/31107a641f10422ca6b0c03521a58ab1 certificateThumbprint=6D6F51972823298010CD940BB6A309CA9064D964 --verbose

@@ -1,0 +1,22 @@
+# -- Self-signed / Bring your own certs --
+# Create a new self-signed cert, specifying the FQDN as the subject.
+openssl req -x509 -newkey rsa:2048 -subj '/CN=mcollier-sf2018-lx-04.eastus2.cloudapp.azure.com' -days 365 -out cert2.crt -keyout cert2.pem -passout pass:Password!
+
+# Convert PEM to PFX
+openssl pkcs12 -export -in cert2.crt -inkey cert2.pem -passin pass:Password! -out cert2.pfx -passout pass:Password!
+
+# Upload to Key Vault
+az keyvault certificate import --vault-name sf-lx-vault --name cert2 --file cert2.pfx --password Password!
+
+# -- Get the values from Key Vault to use in the ARM template --
+# Source vault ID
+az keyvault show --name sf-lx-vault --query id -o tsv
+
+# Certificate thumbprint
+az keyvault certificate show --vault-name sf-lx-vault --name cert2 --query x509ThumbprintHex -o tsv
+
+# Certificate URL
+az keyvault certificate show --vault-name sf-lx-vault --name cert2 --query sid -o tsv
+
+az group create --location eastus2 --name mcollier-sf2018-lx-4 --tags "alias=mcollier" "deleteAfter=03/31/2018"
+az group deployment create -g mcollier-sf2018-lx-4 --template-file azuredeploy-linux-secure.json --parameters @azuredeploy-linux-secure.parameters.json --parameters clusterName=mcollier-sf2018-lx-04 certificateThumbprint=1A915B5CC83557FCA830FED23667B1654E212E99 certificateUrlValue=https://sf-lx-vault.vault.azure.net/secrets/cert2/5d0cddc8ac8042c7846769e199385bd5 --verbose
