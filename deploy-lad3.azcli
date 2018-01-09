@@ -21,16 +21,19 @@ az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-
 # Certificate URL
 az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv-lad3 --query sid -o tsv
 
+
+# -- Create the resource group for the Service Fabric cluster.
 az group create --location eastus2 --name mcollier-sf2018-lx-kv-lad3 --tags "alias=mcollier" "deleteAfter=03/31/2018"
 
 # LAD setup
 # Create the storage account. May be a better way to do this with nested ARM templates?
 # az storage account check-name --name sfladappdiag20180106 --query nameAvailable -o tsv
 az storage account create -g mcollier-sf2018-lx-kv-lad3 -l eastus2 --name sfladappdiag201801061 --kind StorageV2
-#declare sasToken=$(az storage account generate-sas --account-name sfladappdiag201801063 --expiry 9999-12-31T23:59Z --permissions wlacu --resource-types co --services bt -o tsv)
+# az storage account generate-sas --account-name sfladappdiag201801063 --expiry 9999-12-31T23:59Z --permissions wlacu --resource-types co --services bt -o tsv
+# Apparently creating a SAS via the Azure CLI which includes table service is no longer supported. :(
 # https://github.com/Azure/azure-cli/issues/4827
 # https://github.com/MicrosoftDocs/azure-docs/pull/4031
 
-# via portal
+# Create a SAS via the Azure Portal or PowerShell
 
 az group deployment create -g mcollier-sf2018-lx-kv-lad3 --template-file azuredeploy-linux-secure-lad3.json --parameters @azuredeploy-linux-secure.parameters.json --parameters clusterName=mcollier-sf2018-lx-kv-lad3 sourceVaultValue=XXXXXXX certificateUrlValue=XXXXXXXXX certificateThumbprint=XXXXXX applicationDiagnosticsStorageAccountName=sfladappdiag201801061 applicationDiagnosticsStorageAccountSasToken="XXXXXXX" --verbose
