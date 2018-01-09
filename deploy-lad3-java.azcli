@@ -1,0 +1,42 @@
+#az login
+#az account set --subscription ShareshiftSubscription
+
+# -- Key Vault-generated Certificates --
+# Create a cert with the default policy
+az keyvault certificate create --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv-lad3-java -p @policy-java.json
+
+# Download the secrete (private key information) associated with the cert
+az keyvault secret download --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv-lad3-java --encoding base64 --file mcollier-sf2018-lx-kv-lad3-java.pfx
+
+# Convert from PFX to PEM. Password is blank. (Likely not needed if on Linux.)
+openssl pkcs12 -in mcollier-sf2018-lx-kv-lad3-java.pfx -out mcollier-sf2018-lx-kv-lad3-java.pem -nodes
+
+# -- Get the values from Key Vault to use in the ARM template --
+# Source vault ID
+az keyvault show --name sf-lx-vault --query id -o tsv
+# 
+
+# Certificate thumbprint
+az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv-lad3-java --query x509ThumbprintHex -o tsv
+# 
+
+# Certificate URL
+az keyvault certificate show --vault-name sf-lx-vault --name mcollier-sf2018-lx-kv-lad3-java --query sid -o tsv
+# 4
+
+# -- Create the resource group for the Service Fabric cluster.
+az group create --location eastus2 --name mcollier-sf2018-lx-kv-lad3-java --tags "alias=mcollier" "deleteAfter=03/31/2018"
+
+# LAD setup
+# Create the storage account. May be a better way to do this with nested ARM templates?
+# az storage account check-name --name sfladappdiag20180106 --query nameAvailable -o tsv
+az storage account create -g mcollier-sf2018-lx-kv-lad3-java -l eastus2 --name sfladappdiag20180109j --kind StorageV2
+# az storage account generate-sas --account-name sfladappdiag201801063 --expiry 9999-12-31T23:59Z --permissions wlacu --resource-types co --services bt -o tsv
+# Apparently creating a SAS via the Azure CLI which includes table service is no longer supported. :(
+# https://github.com/Azure/azure-cli/issues/4827
+# https://github.com/MicrosoftDocs/azure-docs/pull/4031
+
+# Create a SAS via the Azure Portal or PowerShell
+# 
+
+az group deployment create -g mcollier-sf2018-lx-kv-lad3-java --template-file azuredeploy-linux-secure-lad3-java.json --parameters @azuredeploy-linux-secure.parameters.json --parameters clusterName=mcollier-sf2018-lx-kv-lad3-java sourceVaultValue=XXXXXXX certificateUrlValue=XXXXXX certificateThumbprint=XXXXXXXXX applicationDiagnosticsStorageAccountName=sfladappdiag20180109j applicationDiagnosticsStorageAccountSasToken="XXXXXXX" --verbose

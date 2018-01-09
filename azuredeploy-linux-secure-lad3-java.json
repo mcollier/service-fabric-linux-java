@@ -1056,6 +1056,22 @@
                                     },
                                     "typeHandlerVersion": "3.0"
                                 }
+                            },
+                            {
+                                "name": "install_java_extension",
+                                "type": "extensions",
+                                "properties": {
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                        "fileUris": [
+                                            "https://gist.githubusercontent.com/mcollier/0a4eed2095b33bb1f6343c828d77a328/raw/b865eea779dd32fe653225863dfa73a9eba74e88/install-java-3.sh"
+                                        ],
+                                        "commandToExecute": "sh install-java-3.sh"
+                                    }
+                                }
                             }
                         ]
                     },
