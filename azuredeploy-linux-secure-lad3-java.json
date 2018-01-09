@@ -1067,9 +1067,9 @@
                                     "autoUpgradeMinorVersion": true,
                                     "settings": {
                                         "fileUris": [
-                                            "https://gist.githubusercontent.com/mcollier/0a4eed2095b33bb1f6343c828d77a328/raw/b865eea779dd32fe653225863dfa73a9eba74e88/install-java-3.sh"
+                                            "https://raw.githubusercontent.com/mcollier/service-fabric-linux-java/master/install-java.sh"
                                         ],
-                                        "commandToExecute": "sh install-java-3.sh"
+                                        "commandToExecute": "sh install-java.sh"
                                     }
                                 }
                             }
