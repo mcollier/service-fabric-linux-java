@@ -1,8 +1,15 @@
 #!/bin/sh
 
-echo "installing packages"
-until apt-get -y update && apt-get install -y openjdk-9-jre
+while ( ! (find /var/log/azure/Microsoft.Azure.Diagnostics.LinuxDiagnostic/*/extension.log | xargs grep "Start mdsd"));
 do
-echo "try again"
-sleep 2
-done
+  echo "sleeping for 5"
+  sleep 5 
+done 
+
+echo "updating apt pkgs"
+sudo apt-get -y update 
+
+echo "installing openjdk9"
+sudo apt-get -y install openjdk-9-jre
+
+echo "finished"
