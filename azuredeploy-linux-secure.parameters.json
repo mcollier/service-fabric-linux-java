@@ -53,9 +53,6 @@
         "supportLogStorageAccountType": {
             "value": "Standard_LRS"
         },
-        "applicationDiagnosticsStorageAccountType": {
-            "value": "Standard_LRS"
-        },
         "nt0InstanceCount": {
             "value": 5
         },

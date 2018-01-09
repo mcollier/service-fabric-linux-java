@@ -137,17 +137,6 @@
                 "description": "Replication option for the support log storage account"
             }
         },
-        "applicationDiagnosticsStorageAccountType": {
-            "type": "string",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS"
-            ],
-            "defaultValue": "Standard_LRS",
-            "metadata": {
-                "description": "Replication option for the application diagnostics storage account"
-            }
-        },
         "nt0InstanceCount": {
             "type": "int",
             "defaultValue": 5,
@@ -201,7 +190,8 @@
         "vmNodeType0Name": "[toLower(concat('NT1', variables('vmName')))]",
         "wadmetricsresourceid0": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/', variables('vmNodeType0Name'))]"
     },
-    "resources": [{
+    "resources": [
+        {
             "apiVersion": "[variables('storageApiVersion')]",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('supportLogStorageAccountName')]",
@@ -229,12 +219,14 @@
                         "[variables('addressPrefix')]"
                     ]
                 },
-                "subnets": [{
-                    "name": "[variables('subnet0Name')]",
-                    "properties": {
-                        "addressPrefix": "[variables('subnet0Prefix')]"
+                "subnets": [
+                    {
+                        "name": "[variables('subnet0Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet0Prefix')]"
+                        }
                     }
-                }]
+                ]
             },
             "tags": {
                 "resourceType": "Service Fabric",
@@ -266,35 +258,40 @@
                 "[concat('Microsoft.Network/publicIPAddresses/',concat(variables('lbIPName'),'-',variables('vmNodeType0Name')))]"
             ],
             "properties": {
-                "frontendIPConfigurations": [{
-                    "name": "LoadBalancerIPConfig",
-                    "properties": {
-                        "publicIPAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('lbIPName'),'-',variables('vmNodeType0Name')))]"
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerIPConfig",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('lbIPName'),'-',variables('vmNodeType0Name')))]"
+                            }
                         }
                     }
-                }],
-                "backendAddressPools": [{
-                    "name": "LoadBalancerBEAddressPool",
-                    "properties": {}
-                }],
-                "loadBalancingRules": [{
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "LoadBalancerBEAddressPool",
+                        "properties": {}
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
                         "name": "LBRule",
                         "properties": {
                             "backendAddressPool": {
                                 "id": "[variables('lbPoolID0')]"
                             },
                             "backendPort": "[variables('nt0fabricTcpGatewayPort')]",
-                            "enableFloatingIP": "false",
+                            "enableFloatingIP": false,
                             "frontendIPConfiguration": {
                                 "id": "[variables('lbIPConfig0')]"
                             },
                             "frontendPort": "[variables('nt0fabricTcpGatewayPort')]",
-                            "idleTimeoutInMinutes": "5",
+                            "idleTimeoutInMinutes": 5,
                             "probe": {
                                 "id": "[variables('lbProbeID0')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -304,16 +301,16 @@
                                 "id": "[variables('lbPoolID0')]"
                             },
                             "backendPort": "[variables('nt0fabricHttpGatewayPort')]",
-                            "enableFloatingIP": "false",
+                            "enableFloatingIP": false,
                             "frontendIPConfiguration": {
                                 "id": "[variables('lbIPConfig0')]"
                             },
                             "frontendPort": "[variables('nt0fabricHttpGatewayPort')]",
-                            "idleTimeoutInMinutes": "5",
+                            "idleTimeoutInMinutes": 5,
                             "probe": {
                                 "id": "[variables('lbHttpProbeID0')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -323,16 +320,16 @@
                                 "id": "[variables('lbPoolID0')]"
                             },
                             "backendPort": "[parameters('loadBalancedAppPort1')]",
-                            "enableFloatingIP": "false",
+                            "enableFloatingIP": false,
                             "frontendIPConfiguration": {
                                 "id": "[variables('lbIPConfig0')]"
                             },
                             "frontendPort": "[parameters('loadBalancedAppPort1')]",
-                            "idleTimeoutInMinutes": "5",
+                            "idleTimeoutInMinutes": 5,
                             "probe": {
                                 "id": "[concat(variables('lbID0'),'/probes/AppPortProbe1')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -342,26 +339,27 @@
                                 "id": "[variables('lbPoolID0')]"
                             },
                             "backendPort": "[parameters('loadBalancedAppPort2')]",
-                            "enableFloatingIP": "false",
+                            "enableFloatingIP": false,
                             "frontendIPConfiguration": {
                                 "id": "[variables('lbIPConfig0')]"
                             },
                             "frontendPort": "[parameters('loadBalancedAppPort2')]",
-                            "idleTimeoutInMinutes": "5",
+                            "idleTimeoutInMinutes": 5,
                             "probe": {
                                 "id": "[concat(variables('lbID0'),'/probes/AppPortProbe2')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     }
                 ],
-                "probes": [{
+                "probes": [
+                    {
                         "name": "FabricGatewayProbe",
                         "properties": {
                             "intervalInSeconds": 5,
                             "numberOfProbes": 2,
                             "port": "[variables('nt0fabricTcpGatewayPort')]",
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -370,7 +368,7 @@
                             "intervalInSeconds": 5,
                             "numberOfProbes": 2,
                             "port": "[variables('nt0fabricHttpGatewayPort')]",
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -379,7 +377,7 @@
                             "intervalInSeconds": 5,
                             "numberOfProbes": 2,
                             "port": "[parameters('loadBalancedAppPort1')]",
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -388,22 +386,24 @@
                             "intervalInSeconds": 5,
                             "numberOfProbes": 2,
                             "port": "[parameters('loadBalancedAppPort2')]",
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     }
                 ],
-                "inboundNatPools": [{
-                    "name": "LoadBalancerBEAddressNatPool",
-                    "properties": {
-                        "backendPort": "22",
-                        "frontendIPConfiguration": {
-                            "id": "[variables('lbIPConfig0')]"
-                        },
-                        "frontendPortRangeEnd": "4500",
-                        "frontendPortRangeStart": "3389",
-                        "protocol": "tcp"
+                "inboundNatPools": [
+                    {
+                        "name": "LoadBalancerBEAddressNatPool",
+                        "properties": {
+                            "backendPort": 22,
+                            "frontendIPConfiguration": {
+                                "id": "[variables('lbIPConfig0')]"
+                            },
+                            "frontendPortRangeEnd": 4500,
+                            "frontendPortRangeStart": 3389,
+                            "protocol": "Tcp"
+                        }
                     }
-                }]
+                ]
             },
             "tags": {
                 "resourceType": "Service Fabric",
@@ -427,7 +427,8 @@
                 },
                 "virtualMachineProfile": {
                     "extensionProfile": {
-                        "extensions": [{
+                        "extensions": [
+                            {
                                 "name": "[concat('ServiceFabricNodeVmExt','_vmNodeType0Name')]",
                                 "properties": {
                                     "type": "ServiceFabricLinuxNode",
@@ -467,7 +468,8 @@
                                             "diagnosticMonitorConfiguration": {
                                                 "eventVolume": "Medium",
                                                 "metrics": {
-                                                    "metricAggregation": [{
+                                                    "metricAggregation": [
+                                                        {
                                                             "scheduledTransferPeriod": "PT1H"
                                                         },
                                                         {
@@ -477,11 +479,14 @@
                                                     "resourceId": "[variables('wadmetricsresourceid0')]"
                                                 },
                                                 "performanceCounters": {
-                                                    "performanceCounterConfiguration": [{
-                                                            "annotation": [{
-                                                                "displayName": "Disk read guest OS",
-                                                                "locale": "en-us"
-                                                            }],
+                                                    "performanceCounterConfiguration": [
+                                                        {
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk read guest OS",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "readbytespersecond",
@@ -490,10 +495,12 @@
                                                             "unit": "BytesPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk writes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk writes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "writespersecond",
@@ -502,10 +509,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk transfer time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk transfer time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "averagetransfertime",
@@ -514,10 +523,12 @@
                                                             "unit": "Seconds"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk transfers",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk transfers",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "transferspersecond",
@@ -526,10 +537,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk write guest OS",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk write guest OS",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "writebytespersecond",
@@ -538,10 +551,12 @@
                                                             "unit": "BytesPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk read time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk read time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "averagereadtime",
@@ -550,10 +565,12 @@
                                                             "unit": "Seconds"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk write time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk write time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "averagewritetime",
@@ -562,10 +579,12 @@
                                                             "unit": "Seconds"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk total bytes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk total bytes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "bytespersecond",
@@ -574,10 +593,12 @@
                                                             "unit": "BytesPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk reads",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk reads",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "readspersecond",
@@ -586,10 +607,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Disk queue length",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Disk queue length",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "disk",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "averagediskqueuelength",
@@ -598,10 +621,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Network in guest OS",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Network in guest OS",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "bytesreceived",
                                                             "counterSpecifier": "/builtin/network/bytesreceived",
@@ -609,10 +634,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Network total bytes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Network total bytes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "bytestotal",
                                                             "counterSpecifier": "/builtin/network/bytestotal",
@@ -620,10 +647,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Network out guest OS",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Network out guest OS",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "bytestransmitted",
                                                             "counterSpecifier": "/builtin/network/bytestransmitted",
@@ -631,10 +660,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Network collisions",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Network collisions",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "totalcollisions",
                                                             "counterSpecifier": "/builtin/network/totalcollisions",
@@ -642,10 +673,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Packets received errors",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Packets received errors",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "totalrxerrors",
                                                             "counterSpecifier": "/builtin/network/totalrxerrors",
@@ -653,10 +686,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Packets sent",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Packets sent",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "packetstransmitted",
                                                             "counterSpecifier": "/builtin/network/packetstransmitted",
@@ -664,10 +699,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Packets received",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Packets received",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "packetsreceived",
                                                             "counterSpecifier": "/builtin/network/packetsreceived",
@@ -675,10 +712,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Packets sent errors",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Packets sent errors",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "network",
                                                             "counter": "totaltxerrors",
                                                             "counterSpecifier": "/builtin/network/totaltxerrors",
@@ -686,10 +725,12 @@
                                                             "unit": "Count"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem transfers/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem transfers/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "transferspersecond",
@@ -698,10 +739,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem % free space",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem % free space",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentfreespace",
@@ -710,10 +753,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem % used space",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem % used space",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentusedspace",
@@ -722,10 +767,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem used space",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem used space",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "usedspace",
@@ -734,10 +781,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem read bytes/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem read bytes/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "bytesreadpersecond",
@@ -746,10 +795,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem free space",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem free space",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "freespace",
@@ -758,10 +809,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem % free inodes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem % free inodes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentfreeinodes",
@@ -770,10 +823,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem bytes/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem bytes/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "bytespersecond",
@@ -782,10 +837,12 @@
                                                             "unit": "BytesPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem reads/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem reads/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "readspersecond",
@@ -794,10 +851,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem write bytes/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem write bytes/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "byteswrittenpersecond",
@@ -806,10 +865,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem writes/sec",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem writes/sec",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "writespersecond",
@@ -818,10 +879,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Filesystem % used inodes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Filesystem % used inodes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "filesystem",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentusedinodes",
@@ -830,10 +893,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU IO wait time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU IO wait time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentiowaittime",
@@ -842,10 +907,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU user time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU user time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentusertime",
@@ -854,10 +921,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU nice time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU nice time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentnicetime",
@@ -866,10 +935,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU percentage guest OS",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU percentage guest OS",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentprocessortime",
@@ -878,10 +949,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU interrupt time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU interrupt time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentinterrupttime",
@@ -890,10 +963,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU idle time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU idle time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentidletime",
@@ -902,10 +977,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "CPU privileged time",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "CPU privileged time",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "processor",
                                                             "condition": "IsAggregate=TRUE",
                                                             "counter": "percentprivilegedtime",
@@ -914,10 +991,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Memory available",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Memory available",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "availablememory",
                                                             "counterSpecifier": "/builtin/memory/availablememory",
@@ -925,10 +1004,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Swap percent used",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Swap percent used",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "percentusedswap",
                                                             "counterSpecifier": "/builtin/memory/percentusedswap",
@@ -936,10 +1017,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Memory used",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Memory used",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "usedmemory",
                                                             "counterSpecifier": "/builtin/memory/usedmemory",
@@ -947,10 +1030,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Page reads",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Page reads",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "pagesreadpersec",
                                                             "counterSpecifier": "/builtin/memory/pagesreadpersec",
@@ -958,10 +1043,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Swap available",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Swap available",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "availableswap",
                                                             "counterSpecifier": "/builtin/memory/availableswap",
@@ -969,10 +1056,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Swap percent available",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Swap percent available",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "percentavailableswap",
                                                             "counterSpecifier": "/builtin/memory/percentavailableswap",
@@ -980,10 +1069,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Mem. percent available",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Mem. percent available",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "percentavailablememory",
                                                             "counterSpecifier": "/builtin/memory/percentavailablememory",
@@ -991,10 +1082,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Pages",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Pages",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "pagespersec",
                                                             "counterSpecifier": "/builtin/memory/pagespersec",
@@ -1002,10 +1095,12 @@
                                                             "unit": "CountPerSecond"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Swap used",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Swap used",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "usedswap",
                                                             "counterSpecifier": "/builtin/memory/usedswap",
@@ -1013,10 +1108,12 @@
                                                             "unit": "Bytes"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Memory percentage",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Memory percentage",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "percentusedmemory",
                                                             "counterSpecifier": "/builtin/memory/percentusedmemory",
@@ -1024,10 +1121,12 @@
                                                             "unit": "Percent"
                                                         },
                                                         {
-                                                            "annotation": [{
-                                                                "displayName": "Page writes",
-                                                                "locale": "en-us"
-                                                            }],
+                                                            "annotation": [
+                                                                {
+                                                                    "displayName": "Page writes",
+                                                                    "locale": "en-us"
+                                                                }
+                                                            ],
                                                             "class": "memory",
                                                             "counter": "pageswrittenpersec",
                                                             "counterSpecifier": "/builtin/memory/pageswrittenpersec",
@@ -1087,39 +1186,51 @@
                         ]
                     },
                     "networkProfile": {
-                        "networkInterfaceConfigurations": [{
-                            "name": "[concat(variables('nicName'), '-0')]",
-                            "properties": {
-                                "ipConfigurations": [{
-                                    "name": "[concat(variables('nicName'),'-',0)]",
-                                    "properties": {
-                                        "loadBalancerBackendAddressPools": [{
-                                            "id": "[variables('lbPoolID0')]"
-                                        }],
-                                        "loadBalancerInboundNatPools": [{
-                                            "id": "[variables('lbNatPoolID0')]"
-                                        }],
-                                        "subnet": {
-                                            "id": "[variables('subnet0Ref')]"
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[concat(variables('nicName'), '-0')]",
+                                "properties": {
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[concat(variables('nicName'),'-',0)]",
+                                            "properties": {
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[variables('lbPoolID0')]"
+                                                    }
+                                                ],
+                                                "loadBalancerInboundNatPools": [
+                                                    {
+                                                        "id": "[variables('lbNatPoolID0')]"
+                                                    }
+                                                ],
+                                                "subnet": {
+                                                    "id": "[variables('subnet0Ref')]"
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
-                                "primary": true
+                                    ],
+                                    "primary": true
+                                }
                             }
-                        }]
+                        ]
                     },
                     "osProfile": {
                         "adminPassword": "[parameters('adminPassword')]",
                         "adminUsername": "[parameters('adminUsername')]",
                         "computernamePrefix": "[variables('vmNodeType0Name')]",
-                        "secrets": [{
-                            "sourceVault": {
-                                "id": "[parameters('sourceVaultValue')]"
-                            },
-                            "vaultCertificates": [{
-                                "certificateUrl": "[parameters('certificateUrlValue')]"
-                            }]
-                        }]
+                        "secrets": [
+                            {
+                                "sourceVault": {
+                                    "id": "[parameters('sourceVaultValue')]"
+                                },
+                                "vaultCertificates": [
+                                    {
+                                        "certificateUrl": "[parameters('certificateUrlValue')]"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     "storageProfile": {
                         "imageReference": {
@@ -1173,30 +1284,36 @@
                     "storageAccountName": "[variables('supportLogStorageAccountName')]",
                     "tableEndpoint": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('supportLogStorageAccountName')), variables('storageApiVersion')).primaryEndpoints.table]"
                 },
-                "fabricSettings": [{
-                    "parameters": [{
-                        "name": "ClusterProtectionLevel",
-                        "value": "[parameters('clusterProtectionLevel')]"
-                    }],
-                    "name": "Security"
-                }],
+                "fabricSettings": [
+                    {
+                        "parameters": [
+                            {
+                                "name": "ClusterProtectionLevel",
+                                "value": "[parameters('clusterProtectionLevel')]"
+                            }
+                        ],
+                        "name": "Security"
+                    }
+                ],
                 "managementEndpoint": "[concat('https://',reference(concat(variables('lbIPName'),'-',variables('vmNodeType0Name'))).dnsSettings.fqdn,':',variables('nt0fabricHttpGatewayPort'))]",
-                "nodeTypes": [{
-                    "name": "[variables('vmNodeType0Name')]",
-                    "applicationPorts": {
-                        "endPort": "[variables('nt0applicationEndPort')]",
-                        "startPort": "[variables('nt0applicationStartPort')]"
-                    },
-                    "clientConnectionEndpointPort": "[variables('nt0fabricTcpGatewayPort')]",
-                    "durabilityLevel": "Bronze",
-                    "ephemeralPorts": {
-                        "endPort": "[variables('nt0ephemeralEndPort')]",
-                        "startPort": "[variables('nt0ephemeralStartPort')]"
-                    },
-                    "httpGatewayEndpointPort": "[variables('nt0fabricHttpGatewayPort')]",
-                    "isPrimary": true,
-                    "vmInstanceCount": "[parameters('nt0InstanceCount')]"
-                }],
+                "nodeTypes": [
+                    {
+                        "name": "[variables('vmNodeType0Name')]",
+                        "applicationPorts": {
+                            "endPort": "[variables('nt0applicationEndPort')]",
+                            "startPort": "[variables('nt0applicationStartPort')]"
+                        },
+                        "clientConnectionEndpointPort": "[variables('nt0fabricTcpGatewayPort')]",
+                        "durabilityLevel": "Bronze",
+                        "ephemeralPorts": {
+                            "endPort": "[variables('nt0ephemeralEndPort')]",
+                            "startPort": "[variables('nt0ephemeralStartPort')]"
+                        },
+                        "httpGatewayEndpointPort": "[variables('nt0fabricHttpGatewayPort')]",
+                        "isPrimary": true,
+                        "vmInstanceCount": "[parameters('nt0InstanceCount')]"
+                    }
+                ],
                 "provisioningState": "Default",
                 "reliabilityLevel": "Silver",
                 "upgradeMode": "Automatic",
