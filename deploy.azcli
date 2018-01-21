@@ -1,0 +1,36 @@
+#az login
+#az account set --subscription [SUBSCRIPTION-NAME / SUBSCRIPTION-ID]
+
+# Create a certificate
+./new-service-fabric-cluster-certificate.sh [REGION] [KEY-VAULT-RESOURCE-GROUP] [KEY-VAULT-NAME] [CERTIFICATE-PASSWORD] [CLUSTER-DNS-NAME-FOR-CERTIFICATE]
+
+# -- Create the resource group for the Service Fabric cluster.
+az group create --location [REGION] --name [RESOURCE-GROUP-NAME]
+
+# LAD 3.0 setup
+# Check the storage account name
+# az storage account check-name --name sfladappdiag20180106 --query nameAvailable -o tsv
+
+# Create a storage account. Place the storage account name in the parametes file (under 'applicationDiagnosticsStorageAccountName').
+az storage account create -g [RESOURCE-GROUP-NAME] -l [REGION] --name [STORAGE-ACCOUNT-NAME] --kind StorageV2
+
+# Creating a SAS via the Azure CLI ('az storage account generate-sas') which includes table service is not supported. :(
+# https://github.com/Azure/azure-cli/issues/4827 and https://github.com/MicrosoftDocs/azure-docs/pull/4031
+
+# TODO: Create an Azure Storage account SAS for Blob and Table services via the Azure Portal
+# or PowerShell. Put the SAS token in the parameters file under 'applicationDiagnosticsStorageAccountSasToken'.
+
+
+# Create an Event Hub for LAD 3.0 to use as another sink. 
+# Set the parameters as defined in the template.
+az group deployment create -g [RESOURCE-GROUP-NAME] --template-uri https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-event-hubs-create-event-hub-and-consumer-group/azuredeploy.json --parameters namespaceName=[EVENT-HUB-NAMESPACE] eventHubName=[EVENT-HUB-NAME] consumerGroupName=[EVENT-HUB-CONSUMER-GROUP]
+
+# TODO: Create a SAS for the Event Hub. Place the SAS in the parameters file ('loggingEventHubSAS').
+#       Create a Shared Access Policy on the target namespace. Set permission to Write.
+#       The SAS URL for the parameters files hould resemble the following:
+#       https://mcollier-sf2018-2-eh.servicebus.windows.net/mysflog?sr=https%3a%2f%2fmcollier-sf2018-2-eh.servicebus.windows.net%2fmysflogs&sig=dorijnoVvEMMBgmY5GygULy%2f%2feL5EtOVcrf%2bDET6%2bbw%3d&se=1547932739&skn=LogWriter
+
+
+# OPTIONAL: Use the following line to get a somewhat unique deployment name. Use -n parameter in 'az group deployment create'.
+# echo "azuredeploy"$(date +%s)
+az group deployment create -g [RESOURCE-GROUP-NAME] --template-file azuredeploy.json --parameters @azuredeploy.parameters.json --verbose

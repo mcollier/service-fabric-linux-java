@@ -6,13 +6,13 @@
             "value": "eastus2"
         },
         "clusterName": {
-            "value": ""
+            "value": "GEN-UNIQUE"
         },
         "adminUserName": {
-            "value": "myadmin"
+            "value": "CHANGE-ME"
         },
         "adminPassword": {
-            "value": "Password!1"
+            "value": "GEN-PASSWORD"
         },
         "vmImagePublisher": {
             "value": "Canonical"
@@ -39,13 +39,13 @@
             "value": "My"
         },
         "certificateThumbprint": {
-            "value": ""
+            "value": "CHANGE-ME"
         },
         "sourceVaultValue": {
-            "value": ""
+            "value": "GEN-KEYVAULT-RESOURCE-ID"
         },
         "certificateUrlValue": {
-            "value": ""
+            "value": "GEN-KEYVAULT-SSL-SECRET-URI"
         },
         "storageAccountType": {
             "value": "Standard_LRS"
@@ -58,6 +58,15 @@
         },
         "vmNodeType0Size": {
             "value": "Standard_D2_v2"
+        },
+        "applicationDiagnosticsStorageAccountName": {
+            "value": "GEN-UNIQUE"
+        },
+        "applicationDiagnosticsStorageAccountSasToken": {
+            "value": "CHANGE-ME"
+        },
+        "loggingEventHubSAS": {
+            "value": "CHANGE-ME"
         }
     }
 }

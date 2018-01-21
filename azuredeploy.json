@@ -153,6 +153,9 @@
         },
         "applicationDiagnosticsStorageAccountSasToken": {
             "type": "string"
+        },
+        "loggingEventHubSAS": {
+            "type": "string"
         }
     },
     "variables": {
@@ -188,7 +191,8 @@
         "lbHttpProbeID0": "[concat(variables('lbID0'),'/probes/FabricHttpGatewayProbe')]",
         "lbNatPoolID0": "[concat(variables('lbID0'),'/inboundNatPools/LoadBalancerBEAddressNatPool')]",
         "vmNodeType0Name": "[toLower(concat('NT1', variables('vmName')))]",
-        "wadmetricsresourceid0": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/', variables('vmNodeType0Name'))]"
+        "wadmetricsresourceid0": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/', variables('vmNodeType0Name'))]",
+        "logEventHubSink": "LogEventHub"
     },
     "resources": [{
             "apiVersion": "[variables('storageApiVersion')]",
@@ -448,11 +452,32 @@
                                     "protectedSettings": {
                                         "storageAccountName": "[parameters('applicationDiagnosticsStorageAccountName')]",
                                         "storageAccountEndPoint": "https://core.windows.net/",
-                                        "storageAccountSasToken": "[parameters('applicationDiagnosticsStorageAccountSasToken')]"
+                                        "storageAccountSasToken": "[parameters('applicationDiagnosticsStorageAccountSasToken')]",
+                                        "sinksConfig": {
+                                            "sink": [{
+                                                "name": "[variables('logEventHubSink')]",
+                                                "type": "EventHub",
+                                                "sasURL": "[parameters('loggingEventHubSAS')]"
+                                            }]
+                                        }
                                     },
                                     "publisher": "Microsoft.Azure.Diagnostics",
                                     "settings": {
+                                        "StorageAccount": "[parameters('applicationDiagnosticsStorageAccountName')]",
+                                        "fileLogs": [{
+                                                "file": "/tmp/watchdog-mysfapp0.0.log",
+                                                "table": "WatchdogLogs",
+                                                "sinks": "[variables('logEventHubSink')]"
+                                            },
+                                            {
+                                                "file": "/tmp/mysfapp0.0.log",
+                                                "table": "EchoServiceLogs",
+                                                "sinks": ""
+                                            }
+                                        ],
+                                        "perfCfg": [],
                                         "ladCfg": {
+                                            "sampleRateInSeconds": 15,
                                             "diagnosticMonitorConfiguration": {
                                                 "eventVolume": "Medium",
                                                 "metrics": {
@@ -1049,10 +1074,8 @@
                                                         "LOG_UUCP": "LOG_DEBUG"
                                                     }
                                                 }
-                                            },
-                                            "sampleRateInSeconds": 15
-                                        },
-                                        "StorageAccount": "[parameters('applicationDiagnosticsStorageAccountName')]"
+                                            }
+                                        }
                                     },
                                     "typeHandlerVersion": "3.0"
                                 }
